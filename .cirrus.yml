@@ -1,0 +1,34 @@
+container:
+  image: node:latest
+#
+#test_task:
+#  node_modules_cache:
+#    folder: node_modules
+#    fingerprint_script: cat yarn.lock
+#    populate_script: yarn install
+#  test_script:
+#    - yarn test
+
+build_task:
+  node_modules_cache:
+    folder: node_modules
+    fingerprint_script: cat yarn.lock
+    populate_script: yarn install
+  build_script:
+    - yarn build
+
+lint_task:
+  node_modules_cache:
+    folder: node_modules
+    fingerprint_script: cat yarn.lock
+    populate_script: yarn install
+  lint_script:
+    - yarn fmt
+
+build_prod:task:
+  node_modules_cache:
+    folder: node_modules
+    fingerprint_script: cat yarn.lock
+    populate_script: yarn install
+  build_prod_script:
+    - yarn build:prod
