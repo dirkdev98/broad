@@ -5,20 +5,20 @@
   "main": "cmd/broad/main.ts",
   "scripts": {
     "build": "ncc build cmd/broad/main.ts -o out/",
-    "build:prod": "yarn build --v8-cache -m",
+    "build:prod": "yarn build",
     "fmt": "yarn build && ./out/index.js fmt",
-    "test": "jest"
+    "test": "yarn build && ./out/index.js test",
+    "bench": "yarn build && ./out/index.js bench"
   },
   "author": "Dirk de Visser <dirkdev98@gmail.com>",
   "license": "MIT",
   "devDependencies": {
-    "@types/jest": "24.0.15",
     "@types/node": "12.6.8",
-    "@types/prettier": "^1.18.0",
+    "@types/prettier": "^1.18.0"
+  },
+  "dependencies": {
     "@zeit/ncc": "0.20.4",
-    "jest": "24.8.0",
     "prettier": "1.18.2",
-    "ts-jest": "24.0.2",
     "typescript": "3.5.3"
   },
   "sideEffects": "false",

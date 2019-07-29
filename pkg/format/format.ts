@@ -15,7 +15,7 @@ const prettierConfig: Options = {
 
 // Formats file with prettier using the following configuration in the prettierConfig variable above
 // for more information on configuration see the prettier documentation
-export async function formatFile(filepath: string): Promise<void> {
+export async function file(filepath: string): Promise<void> {
   const fileSource = await fs.readFile(filepath);
   const formattedSource = await format(fileSource.toString(), { ...prettierConfig, filepath });
   await fs.writeFile(filepath, formattedSource);
