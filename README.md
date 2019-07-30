@@ -1,10 +1,10 @@
-# Broad
+# NTO
 
 Standard library & tools for your new Node project
 
 ```bash
-yarn add broad
-# npm install broad
+yarn add nto
+# npm install nto
 ```
 
 ## Features

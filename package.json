@@ -1,10 +1,14 @@
 {
-  "name": "broad",
+  "name": "nto",
   "version": "0.1.0",
   "description": "Standard library & tools for your new Node project",
-  "main": "cmd/broad/main.ts",
+  "main": "out/lib/index.js",
+  "types": "out/lib/index.d.ts",
+  "bin": {
+    "nto": "./out/nto/index.js"
+  },
   "scripts": {
-    "build": "ncc build cmd/broad/main.ts -o out/",
+    "build": "ncc build cmd/nto/main.ts -o out/",
     "build:prod": "yarn build",
     "fmt": "yarn build && ./out/index.js fmt",
     "test": "yarn build && ./out/index.js test",
@@ -14,18 +18,18 @@
   "license": "MIT",
   "devDependencies": {
     "@types/node": "12.6.8",
-    "@types/prettier": "^1.18.0"
+    "@types/prettier": "1.18.0",
+    "prettier": "1.18.2"
   },
   "dependencies": {
     "@zeit/ncc": "0.20.4",
-    "prettier": "1.18.2",
     "typescript": "3.5.3"
   },
   "sideEffects": "false",
   "type": "module",
   "repository": {
     "type": "git",
-    "url": "https://github.com/dirkdev98/broad.git"
+    "url": "https://github.com/dirkdev98/nto.git"
   },
   "keywords": [
     "build",
@@ -33,7 +37,15 @@
     "benchmark",
     "format",
     "prettier",
-    "stdlib"
+    "stdlib",
+    "nto",
+    "standard-library",
+    "standard"
   ],
-  "files": []
+  "files": [
+    "./out/*",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ]
 }

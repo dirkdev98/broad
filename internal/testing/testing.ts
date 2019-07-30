@@ -2,7 +2,7 @@ import { join } from "path";
 
 export function filterFiles(files: string[]): string[] {
   const result: string[] = [];
-  const testDir = join(process.cwd(), "/test");
+  const testDir = join(process.cwd(), "/test/");
 
   for (const file of files) {
     if (file.startsWith(testDir) || file.includes("_test.js") || file.includes("_test.ts")) {
@@ -14,7 +14,7 @@ export function filterFiles(files: string[]): string[] {
 }
 
 export function generateFile(imports: string[], isBenchmark: boolean): string {
-  let source = `import { BenchmarkHelper, TestHelper } from "broad/pkg/testing/helper";
+  let source = `import { BenchmarkHelper, TestHelper } from "nto/pkg/testing/helper";
   `;
 
   for (let i = 0; i < imports.length; ++i) {

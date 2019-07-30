@@ -12,17 +12,26 @@ tsConfig.outDir = join(process.cwd(), "out/lib");
 tsConfig.target = ScriptTarget.ES2019;
 tsConfig.moduleResolution = undefined;
 
+// Hack around @zeit/ncc
+const filterPath = (filter: string) => join(process.cwd(), filter);
+
 // Took most of this code from https://github.com/microsoft/TypeScript/wiki/Using-the-Compiler-API
 export async function buildLib() {
   const projectFiles = resolveFiles();
   const testFiles = filterFiles(projectFiles);
   const libFiles = [];
-  const libPath = join(process.cwd(), "/pkg");
+  const libPath = filterPath("pkg");
 
   for (const file of projectFiles) {
     if (!testFiles.includes(file) && file.startsWith(libPath)) {
       libFiles.push(file);
     }
+  }
+
+  try {
+    await fs.mkdir(tsConfig.outDir!);
+  } catch (e) {
+    console.error(e);
   }
 
   let program = ts.createProgram(libFiles, tsConfig);
@@ -49,17 +58,40 @@ export async function buildLib() {
 
 export async function buildCmd(...names: string[]) {
   for (const name of names) {
-    const result = await ncc(process.cwd() + `/cmd/${name}/main.ts`, {
-      quiet: true,
-      externals: ["typescript", "prettier", "@zeit/ncc"],
-    });
+    await buildWithPaths(process.cwd() + `/cmd/${name}/main.ts`, process.cwd() + `/out/${name}/`);
+  }
+}
 
-    Object.keys(result).forEach(it => {
-      if (it === "code") {
-        console.log("code");
-      } else {
-        console.log(`${it}: ${Object.keys(result[it] || {}).join(", ")}`);
+export async function buildWithPaths(inputPath: string, outputPath: string) {
+  const result = await ncc(inputPath, {
+    quiet: true,
+    externals: ["typescript", "@zeit/ncc"],
+  });
+
+  try {
+    await fs.mkdir(outputPath, { recursive: true });
+  } catch (e) {
+    // most likely directory exists
+    console.error(e);
+  }
+
+  await fs.writeFile(outputPath + "index.js", result.code);
+  for (const asset in result.assets) {
+    // noinspection JSUnfilteredForInLoop
+
+    if (!asset.endsWith(".d.ts")) {
+      // skip .d.ts files cause they are not useful with a 'binary'-build
+      const assetDir = asset
+        .split("/")
+        .slice(0, -1)
+        .join("/");
+      try {
+        await fs.mkdir(outputPath + assetDir, { recursive: true });
+      } catch (e) {
+        // most likely directory exists
+        console.error(e);
       }
-    });
+      await fs.writeFile(outputPath + asset, result.assets[asset]);
+    }
   }
 }
