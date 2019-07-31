@@ -14,7 +14,7 @@ export function filterFiles(files: string[]): string[] {
 }
 
 export function generateFile(imports: string[], isBenchmark: boolean): string {
-  let source = `import { BenchmarkHelper, TestHelper } from "nto/pkg/testing/helper";
+  let source = `import { BenchmarkHelper, TestHelper } from "nto/out/lib/pkg/testing/helper";
   `;
 
   for (let i = 0; i < imports.length; ++i) {
