@@ -1,10 +1,15 @@
-import { B, T } from "./types";
+import { Expect } from "./expect";
+import { B, Matcher, T } from "./types";
 
 export class TestHelper implements T {
-  constructor(private funcName: string, private fn: (t: T) => any) {}
+  constructor(protected funcName: string, protected fn: (t: T) => any) {}
+
+  public expect(value: unknown): Matcher {
+    return new Expect(value);
+  }
 
   public fail(...args: any[]): void {
-    throw new Error(`Error in ${this.funcName}: ${args.join(" ")}`);
+    throw new Error(`Error in ${this.funcName}: ${JSON.stringify(args)}`);
   }
 
   public async exec(): Promise<void> {
@@ -12,7 +17,7 @@ export class TestHelper implements T {
   }
 }
 
-export class BenchmarkHelper implements B {
+export class BenchmarkHelper extends TestHelper implements B {
   public static counts = [
     5,
     10,
@@ -33,7 +38,9 @@ export class BenchmarkHelper implements B {
   private currentIdx: number = 0;
   private start: bigint = BigInt(0);
 
-  constructor(private funcName: string, private fn: (t: B) => any) {}
+  constructor(funcName: string, fn: (b: B) => any) {
+    super(funcName, fn as any);
+  }
 
   public async exec(): Promise<void> {
     for (let i = 0; i < BenchmarkHelper.counts.length; ++i) {

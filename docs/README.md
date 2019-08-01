@@ -8,9 +8,10 @@ Standard library & tools for your new Node project
 ## Getting started
 
 Currently to use nto you need the following dependencies as well: Typescript, @zeit/ncc.
- Run `yarn add -D nto typescript @types/node @zeit/ncc` in a fresh directory to get started.
- 
+Run `yarn add -D nto typescript @types/node @zeit/ncc` in a fresh directory to get started.
+
 At the moment nto is not configurable at all and will assume the following directory structure:
+
 ```text
 /
     cmd/
@@ -70,6 +71,7 @@ Bench will do almost the same as `$ nto test`, except it looks for exported func
 signature: `benchmarkXxxx(b: testing.B): void | Promise<void>`.
 
 An example benchmark function:
+
 ```typescript
 export function benchmarkMyFunction(b: testing.B): void {
   for (let i = 0; i < b.N; ++i) {
@@ -82,3 +84,7 @@ The function will be called with an increasing `b.N` till a single call takes at
 Then it will calculate how much nano seconds are spend per operation and print it out.
 
 Example: `$ nto bench`
+
+## Packages
+
+- [testing](./testing.md)

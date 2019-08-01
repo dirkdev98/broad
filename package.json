@@ -8,7 +8,7 @@
     "nto": "./out/nto/index.js"
   },
   "scripts": {
-    "build": "ncc build cmd/nto/main.ts -o out/",
+    "build": "ncc build cmd/nto/main.ts -o out/ -e typescript -e @zeit/ncc",
     "build:prod": "yarn build",
     "fmt": "yarn build && ./out/index.js fmt",
     "test": "yarn build && ./out/index.js test",

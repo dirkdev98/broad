@@ -13,9 +13,3 @@ yarn add nto
 - Extensive tree-shakeable standard library
 
 Check the [documentation](https://dirkdev98.github.io/nto) for how to get started
-
-## TODO
-
-- [ ] expect package
-- [ ] Documentation
-- [ ] fs package
