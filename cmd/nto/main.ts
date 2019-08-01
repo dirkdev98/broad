@@ -11,7 +11,7 @@ const commandImplementations: Record<string, Function> = {
   build: build,
   test: test,
   bench: test.bind(null, true),
-  run: run
+  run: run,
 };
 const commands = Object.keys(commandImplementations);
 
@@ -19,37 +19,30 @@ export async function main() {
   const args = process.argv.slice(2);
   const subCommand = args[0];
   if (!subCommand || !commands.includes(subCommand)) {
-    console.log(
-      `Unsupported argument ${subCommand}, please use one of ${commands.join(
-        ", "
-      )}.`
-    );
+    console.log(`Unsupported argument ${subCommand}, please use one of ${commands.join(", ")}.`);
   } else {
-    return Promise.resolve(
-      commandImplementations[subCommand](...args.slice(1))
-    );
+    return Promise.resolve(commandImplementations[subCommand](...args.slice(1)));
   }
 }
 
 main().catch(console.error.bind(console));
 
-function fmt() {
+async function fmt() {
   const start = process.hrtime.bigint();
   const files = project.resolveFiles();
 
   const fmtPromiseList = [];
-  fmtPromiseList.length = files.length;
-
   for (const f of files) {
     fmtPromiseList.push(format.file(f));
   }
 
-  Promise.all(fmtPromiseList)
-    .then(() => {
-      const ms = Number(process.hrtime.bigint() - start) / 1000 / 1000;
-      console.log(`Formatting ${files.length} files took ${ms.toFixed(2)} ms.`);
-    })
-    .catch(err => console.error(err));
+  const fmtResult = await Promise.all(fmtPromiseList);
+  const hasChanged = fmtResult.filter(it => !it).length > 0;
+
+  const ms = Number(process.hrtime.bigint() - start) / 1000 / 1000;
+  console.log(`Formatting ${files.length} files took ${ms.toFixed(2)} ms.`);
+
+  process.exit(hasChanged ? 1 : 0);
 }
 
 function test(isBench: boolean = false) {
@@ -94,9 +87,7 @@ function test(isBench: boolean = false) {
   runner.run(process.cwd() + "/out/.tmp/test.ts").then(() => {
     const ms = Number(process.hrtime.bigint() - start) / 1000 / 1000;
     console.log(
-      `Running ${isBench ? "benchmarks" : "tests"} for ${
-        files.length
-      } files took ${ms.toFixed(2)} ms.`
+      `Running ${isBench ? "benchmarks" : "tests"} for ${files.length} files took ${ms.toFixed(2)} ms.`,
     );
   });
 }
