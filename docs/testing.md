@@ -27,5 +27,5 @@ The matcher contains several functions to check for expected values.
 - **toBeTruthy(): Matcher**: Does a loosely check for any JS truthy value
 - **toBeFalsy(): Matcher**: Does a loosely check for any JS falsy value
 - **toBeNil(): Matcher**: Only passes with `undefined` and `null`
-- **toHaveKeys(...keys: (string | number | symbol)[]): Matcher**: Checks if provided object contains all specified keys. A key with `null` as value is considered ok.
+- **toHaveKeys(...keys: (string \| number \| symbol)[]): Matcher**: Checks if provided object contains all specified keys. A key with `null` as value is considered ok.
 - **toResolveWith(other: unknown): Matcher**: awaits the promise and does a `toEqual` check on the result
