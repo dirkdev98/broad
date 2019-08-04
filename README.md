@@ -13,3 +13,10 @@ yarn add nto
 - Extensive tree-shakeable standard library
 
 Check the [documentation](https://dirkdev98.github.io/nto) for how to get started
+
+## Credits
+
+- [Typescript](https://github.com/microsoft/typescript)
+- [Prettier](https://github.com/prettier/prettier)
+- [@zeit/ncc](https://github.com/zeit/ncc)
+- [fs-extra](https://github.com/jprichardson/node-fs-extra)
