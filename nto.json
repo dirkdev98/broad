@@ -4,6 +4,6 @@
   "outDir": "out",
   "libDir": "pkg",
   "build": {
-    "exclude": ["typescript", "@zeit/ncc", "fs-extra"]
+    "exclude": ["typescript", "@zeit/ncc", "prettier", "fs-extra"]
   }
 }

@@ -1,26 +1,23 @@
-import { promises as fs } from "fs";
 import { join } from "path";
 import * as ts from "typescript";
-import { ScriptTarget } from "typescript";
-import { filterFiles } from "../testing";
-import { resolveFiles } from "./project";
+import { fs } from "../../pkg";
+import { filterTestFiles } from "../testing";
+import { resolveConfig } from "./config";
+import { resolveAppNames, resolveFiles } from "./project";
 
 const ncc = require("@zeit/ncc");
 
 const tsConfig: ts.CompilerOptions = require("../../tsconfig.json").compilerOptions;
-tsConfig.outDir = join(process.cwd(), "out/lib");
-tsConfig.target = ScriptTarget.ES2019;
+tsConfig.target = ts.ScriptTarget.ES2019;
 tsConfig.moduleResolution = undefined;
-
-// Hack around @zeit/ncc
-const filterPath = (filter: string) => join(process.cwd(), filter);
 
 // Took most of this code from https://github.com/microsoft/TypeScript/wiki/Using-the-Compiler-API
 export async function buildLib() {
-  const projectFiles = resolveFiles();
-  const testFiles = filterFiles(projectFiles);
+  const { rootDir, config } = await resolveConfig();
+  const projectFiles = await resolveFiles();
+  const testFiles = filterTestFiles(rootDir, projectFiles);
   const libFiles = [];
-  const libPath = filterPath("pkg");
+  const libPath = join(rootDir, config.libDir);
 
   for (const file of projectFiles) {
     if (!testFiles.includes(file) && file.startsWith(libPath)) {
@@ -28,56 +25,60 @@ export async function buildLib() {
     }
   }
 
-  try {
-    await fs.mkdir(tsConfig.outDir!);
-  } catch (e) {
-    console.error(e);
-  }
+  const outDir = join(rootDir, config.outDir, "lib");
+  tsConfig.outDir = outDir;
+  await fs.ensureDir(outDir);
 
   let program = ts.createProgram(libFiles, tsConfig);
   let emitResult = program.emit();
 
   // easier to reexport than to move all files a level up
-  await fs.writeFile(join(tsConfig.outDir!, "index.js"), `export * from "./pkg";\n`);
-  await fs.writeFile(join(tsConfig.outDir!, "index.d.ts"), `export * from "./pkg";\n`);
+  await fs.writeFile(join(outDir, "index.js"), `export * from "./${config.libDir}";\n`);
+  await fs.writeFile(join(outDir, "index.d.ts"), `export * from "./${config.libDir}";\n`);
 
   if (emitResult.emitSkipped) {
     let allDiagnostics = ts.getPreEmitDiagnostics(program).concat(emitResult.diagnostics);
 
-    allDiagnostics.forEach(diagnostic => {
-      if (diagnostic.file) {
-        let { line, character } = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start!);
-        let message = ts.flattenDiagnosticMessageText(diagnostic.messageText, "\n");
-        console.log(`${diagnostic.file.fileName} (${line + 1},${character + 1}): ${message}`);
-      } else {
-        console.log(`${ts.flattenDiagnosticMessageText(diagnostic.messageText, "\n")}`);
-      }
-    });
+    console.dir(allDiagnostics);
   }
 }
 
-export async function buildCmd(...names: string[]) {
+// Builds the specified apps, throws on invalid app name
+export async function buildApps(...names: string[]) {
+  const { rootDir, config } = await resolveConfig();
+  const apps = await resolveAppNames(rootDir, config);
+
   for (const name of names) {
-    await buildWithPaths(process.cwd() + `/cmd/${name}/main.ts`, process.cwd() + `/out/${name}/`);
+    if (!apps.includes(name)) {
+      throw new Error(`Unknown app: ${name}`);
+    }
+  }
+
+  for (const name of names) {
+    await buildApp(
+      join(rootDir, config.appDir, name, "main.ts"),
+      join(rootDir, config.outDir, name),
+      config.build.exclude,
+    );
   }
 }
 
-export async function buildWithPaths(inputPath: string, outputPath: string) {
-  const result = await ncc(inputPath, {
+// Takes input and output and builds a single js file,
+// which include all dependency except those specified in excludes
+export async function buildApp(inputFile: string, outputPath: string, excludes: string[]) {
+  const result = await ncc(inputFile, {
     quiet: true,
-    externals: ["typescript", "@zeit/ncc"],
+    externals: excludes,
   });
 
-  try {
-    await fs.mkdir(outputPath, { recursive: true });
-  } catch (e) {
-    // most likely directory exists
-    console.error(e);
-  }
+  await fs.ensureDir(outputPath);
+  await fs.writeFile(join(outputPath, "index.js"), result.code);
+  await fs.chmod(join(outputPath, "index.js"), "755");
 
-  await fs.writeFile(outputPath + "index.js", result.code);
   for (const asset in result.assets) {
-    // noinspection JSUnfilteredForInLoop
+    if (!Object.prototype.hasOwnProperty.call(result.assets, asset)) {
+      continue;
+    }
 
     if (!asset.endsWith(".d.ts")) {
       // skip .d.ts files cause they are not useful with a 'binary'-build
@@ -85,12 +86,8 @@ export async function buildWithPaths(inputPath: string, outputPath: string) {
         .split("/")
         .slice(0, -1)
         .join("/");
-      try {
-        await fs.mkdir(outputPath + assetDir, { recursive: true });
-      } catch (e) {
-        // most likely directory exists
-        console.error(e);
-      }
+
+      await fs.ensureDir(join(outputPath, assetDir));
       await fs.writeFile(outputPath + asset, result.assets[asset]);
     }
   }

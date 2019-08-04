@@ -15,10 +15,22 @@
     "listEmittedFiles": false,
     "listFiles": false,
     "pretty": true,
-    "lib": ["esnext"],
-    "types": ["node"],
-    "typeRoots": ["node_modules/@types"]
+    "lib": [
+      "esnext"
+    ],
+    "types": [
+      "node"
+    ],
+    "typeRoots": [
+      "node_modules/@types"
+    ]
   },
-  "include": ["./**/*.ts", "./**/*.js"],
-  "exclude": ["node_modules/**", "out/**"]
+  "include": [
+    "./**/*.ts",
+    "./**/*.js"
+  ],
+  "exclude": [
+    "node_modules/**",
+    "out/**"
+  ]
 }

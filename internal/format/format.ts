@@ -1,7 +1,12 @@
-import { promises as fs } from "fs";
 import { check, format, Options } from "prettier";
+import { fs } from "../../pkg";
 
-const prettierConfig: Options = {
+export interface FormatResult {
+  path: string;
+  hasChanged: boolean;
+}
+
+export const prettierConfig: Options = {
   printWidth: 110,
   tabWidth: 2,
   singleQuote: false,
@@ -15,13 +20,13 @@ const prettierConfig: Options = {
 // Formats file with prettier using the following configuration in the prettierConfig variable above
 // for more information on configuration see the prettier documentation
 // returns false if input has changed
-export async function file(filepath: string): Promise<boolean> {
+export async function file(filepath: string): Promise<FormatResult> {
   const config = {
     ...prettierConfig,
     filepath,
   };
 
-  const fileSource = (await fs.readFile(filepath)).toString();
+  const fileSource = await fs.readFile(filepath, "utf-8");
   const isFormatted = check(fileSource, config);
 
   if (!isFormatted) {
@@ -29,5 +34,8 @@ export async function file(filepath: string): Promise<boolean> {
     await fs.writeFile(filepath, formattedSource);
   }
 
-  return isFormatted;
+  return {
+    path: filepath,
+    hasChanged: !isFormatted,
+  };
 }

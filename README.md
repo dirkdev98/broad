@@ -12,7 +12,8 @@ yarn add nto
 - Build, format, test, benchmark your application
 - Extensive tree-shakeable standard library
 
-Check the [documentation](https://dirkdev98.github.io/nto) for how to get started
+Check the [documentation](https://dirkdev98.github.io/nto) for how to get started and the [changelog](./CHANGELOG.md)
+for recent changes.
 
 ## Credits
 

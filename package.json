@@ -1,14 +1,22 @@
 {
   "name": "nto",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Standard library & tools for your new Node project",
   "main": "out/lib/index.js",
   "types": "out/lib/index.d.ts",
   "bin": {
-    "nto": "out/nto/index.js"
+    "nto": "out/nto/index.js",
+    "nto-bench": "out/nto-bench/index.js",
+    "nto-build": "out/nto-build/index.js",
+    "nto-fmt": "out/nto-fmt/index.js",
+    "nto-init": "out/nto-init/index.js",
+    "nto-run": "out/nto-run/index.js",
+    "nto-test": "out/nto-test/index.js"
   },
   "scripts": {
-    "build": "ncc build cmd/nto/main.ts -o out/ -e typescript -e @zeit/ncc -e fs-extra",
+    "build": "ncc build cmd/nto/main.ts -o out/ -e typescript -e @zeit/ncc -e fs-extra -e prettier",
+    "build:build": "ncc build cmd/nto-build/main.ts -o out/nto-build -e typescript -e @zeit/ncc -e fs-extra -e prettier",
+    "build:init": "ncc build cmd/nto-init/main.ts -o out/nto-init -e typescript -e @zeit/ncc -e fs-extra -e prettier",
     "build:prod": "yarn build",
     "nto": "yarn build && ./out/index.js",
     "fmt": "yarn nto fmt",
@@ -20,13 +28,13 @@
   "devDependencies": {
     "@types/fs-extra": "8.0.0",
     "@types/node": "12.6.8",
-    "@types/prettier": "1.18.0",
-    "prettier": "1.18.2"
+    "@types/prettier": "1.18.0"
   },
   "dependencies": {
     "@zeit/ncc": "0.20.4",
     "typescript": "3.5.3",
-    "fs-extra": "8.1.0"
+    "fs-extra": "8.1.0",
+    "prettier": "1.18.2"
   },
   "sideEffects": false,
   "type": "module",

@@ -1,11 +1,13 @@
 import { join } from "path";
 
-export function filterFiles(files: string[]): string[] {
+// Returns all project files that are in the test directory or
+// end with _test.ts / _test.js
+export function filterTestFiles(rootDir: string, files: string[]): string[] {
   const result: string[] = [];
-  const testDir = join(process.cwd(), "/test/");
+  const testDir = join(rootDir, "test");
 
   for (const file of files) {
-    if (file.startsWith(testDir) || file.includes("_test.js") || file.includes("_test.ts")) {
+    if (file.startsWith(testDir) || file.endsWith("_test.js") || file.endsWith("_test.ts")) {
       result.push(file);
     }
   }
@@ -54,6 +56,3 @@ export function generateFile(imports: string[], isBenchmark: boolean): string {
 
   return source;
 }
-
-// compile all test files seperately, with some kind of hook to run them
-// compile all files in single app, with some code gen, but then find some way to clear import cache between each test file

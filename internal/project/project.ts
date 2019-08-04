@@ -1,19 +1,27 @@
-import { Dirent, readdirSync, statSync } from "fs";
 import { extname, join } from "path";
 import { fs } from "../../pkg";
-import { Config } from "./config";
+import { Config, resolveConfig } from "./config";
 
 export const supportedExtensions = [".js", ".ts", ".json"];
 
-export function resolveFiles(): string[] {
-  return resolveRelativeFiles("./");
+// Returns a list of full path to files.
+// This includes app files, library files and test files that end with a supported extension
+export async function resolveFiles(): Promise<string[]> {
+  const { rootDir, config } = await resolveConfig();
+
+  const files = await Promise.all([
+    resolveRelativeFiles(join(rootDir, config.appDir)),
+    resolveRelativeFiles(join(rootDir, config.libDir)),
+    resolveRelativeFiles(join(rootDir, "test")),
+  ]);
+
+  return files.flat();
 }
 
-export function resolveRelativeFiles(pathRelativeToCwd: string): string[] {
-  const relativePath = join(process.cwd(), pathRelativeToCwd);
-
-  const allFiles = listFilesInPath(relativePath);
+export async function resolveRelativeFiles(searchPath: string): Promise<string[]> {
+  const allFiles = await listFilesInPath(searchPath);
   const supportedFiles = [];
+
   for (const file of allFiles) {
     if (supportedExtensions.includes(extname(file))) {
       supportedFiles.push(file);
@@ -23,29 +31,35 @@ export function resolveRelativeFiles(pathRelativeToCwd: string): string[] {
   return supportedFiles;
 }
 
-function listFilesInPath(pathStr: string, list: string[] = []): string[] {
-  const filesInPathStr = readdirSync(pathStr);
+async function listFilesInPath(pathStr: string): Promise<string[]> {
+  if (!(await fs.pathExists(pathStr))) {
+    return [];
+  }
+
+  const filesInPathStr = await fs.readdir(pathStr);
+  const result = [];
 
   for (const file of filesInPathStr) {
-    if (file.indexOf("node_modules") !== -1 || file.indexOf("out") !== -1) {
+    if (file.indexOf("node_modules") !== -1) {
       continue;
     }
 
     const newPath = join(pathStr, file);
-    if (statSync(newPath).isDirectory()) {
-      listFilesInPath(newPath, list);
+    if ((await fs.stat(newPath)).isDirectory()) {
+      const subResult = await listFilesInPath(newPath);
+      result.push(...subResult);
     } else {
-      list.push(newPath);
+      result.push(newPath);
     }
   }
 
-  return list;
+  return result;
 }
 
 export async function resolveAppNames(rootDir: string, cfg: Config): Promise<string[]> {
   const result: string[] = [];
 
-  const paths: Dirent[] = (await fs.readdir(join(rootDir, cfg.appDir), ({
+  const paths: fs.Dirent[] = (await fs.readdir(join(rootDir, cfg.appDir), ({
     withFileTypes: true,
   } as unknown) as any)) as any;
   for (const file of paths) {

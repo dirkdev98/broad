@@ -1,6 +1,6 @@
 # Changelog
 
-### Unreleased
+### 0.2.0
 
 - Add expect style functions to `testing.T` (#5)
 - Add fs-extra as a polyfill for pkg/fs for now.
