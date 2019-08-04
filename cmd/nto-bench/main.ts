@@ -13,9 +13,7 @@ export async function main() {
   const outputPath = join(rootDir, config.outDir, ".tmp");
   const inputFile = join(outputPath, "test.ts");
 
-  await fs.ensureDir(outputPath);
-  await fs.rmdir(outputPath);
-  await fs.ensureDir(outputPath);
+  await fs.emptyDir(outputPath);
   await fs.writeFile(inputFile, src);
 
   await runner.runFile(inputFile);

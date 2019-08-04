@@ -9,12 +9,14 @@ export async function runFile(file: string) {
   const outputPath = join(rootDir, config.outDir, ".tmp");
 
   await buildApp(fullPath, outputPath, config.build.exclude);
-  spawnSync(process.argv[0], [join(outputPath, "index.js"), ...process.argv.slice(3)]);
+  spawnSync(process.argv[0], [join(outputPath, "index.js"), ...process.argv.slice(3)], { stdio: "inherit" });
 }
 
 // Builds the specified app and runs it with the provided arguments
 export async function runApp(appName: string) {
   await buildApps(appName);
   const { rootDir, config } = await resolveConfig();
-  spawnSync(process.argv[0], [join(rootDir, config.outDir, "index.js"), ...process.argv.slice(3)]);
+  spawnSync(process.argv[0], [join(rootDir, config.outDir, "index.js"), ...process.argv.slice(3)], {
+    stdio: "inherit",
+  });
 }

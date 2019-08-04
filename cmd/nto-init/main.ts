@@ -8,7 +8,7 @@ import { fs } from "../../pkg";
 // package.json, tsconfig.json & .prettierrc.
 // Uses current directory as project name.
 async function main() {
-  if (!(await fs.pathExists(join(process.cwd(), "nto.json")))) {
+  if (!(await fs.pathExists("./nto.json"))) {
     const pathParts = process.cwd().split("/");
     const projectName = pathParts[pathParts.length - 1];
 
@@ -30,6 +30,11 @@ async function main() {
       ),
     );
   }
+
+  const { rootDir, config } = await project.resolveConfig();
+  await fs.ensureDir(join(rootDir, config.appDir));
+  await fs.ensureDir(join(rootDir, config.libDir));
+  await fs.ensureDir(join(rootDir, config.outDir));
   await project.syncConfigFiles();
 }
 

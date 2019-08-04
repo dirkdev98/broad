@@ -81,6 +81,13 @@ async function syncPackageJson(rootDir: string, cfg: Config) {
   }, {});
   contents.sideEffects = false;
   contents.type = "module";
+  contents.devDependencies = contents.devDependencies || {
+    nto: "latest",
+    "@zeit/ncc": "0.20.4",
+    typescript: "3.5.3",
+    "fs-extra": "8.1.0",
+    prettier: "1.18.2",
+  };
   contents.dependencies = contents.dependencies || {};
   contents.files = [`${cfg.outDir}/**/*.*`, "README.md", "LICENSE", "CHANGELOG.md"];
 

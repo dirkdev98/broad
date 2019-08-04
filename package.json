@@ -1,6 +1,6 @@
 {
   "name": "nto",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Standard library & tools for your new Node project",
   "main": "out/lib/index.js",
   "types": "out/lib/index.d.ts",

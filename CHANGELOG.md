@@ -1,5 +1,9 @@
 # Changelog
 
+### 0.2.1
+
+Several bugfixes
+
 ### 0.2.0
 
 - Add expect style functions to `testing.T` (#5)
