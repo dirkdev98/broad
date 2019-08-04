@@ -1,0 +1,9 @@
+{
+  "project": "nto",
+  "appDir": "cmd",
+  "outDir": "out",
+  "libDir": "pkg",
+  "build": {
+    "exclude": ["typescript", "@zeit/ncc", "fs-extra"]
+  }
+}

@@ -1,9 +1,9 @@
+import { promises as fs } from "fs";
 import { join } from "path";
 import * as ts from "typescript";
 import { ScriptTarget } from "typescript";
 import { filterFiles } from "../testing";
 import { resolveFiles } from "./project";
-import { promises as fs } from "fs";
 
 const ncc = require("@zeit/ncc");
 

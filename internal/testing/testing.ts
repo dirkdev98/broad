@@ -49,7 +49,7 @@ export function generateFile(imports: string[], isBenchmark: boolean): string {
     }  
   }
   
-  main().then(console.log.bind(console)).catch(console.error.bind(console));
+  main().catch(console.error.bind(console));
   `;
 
   return source;

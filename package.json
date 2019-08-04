@@ -5,14 +5,15 @@
   "main": "out/lib/index.js",
   "types": "out/lib/index.d.ts",
   "bin": {
-    "nto": "./out/nto/index.js"
+    "nto": "out/nto/index.js"
   },
   "scripts": {
-    "build": "ncc build cmd/nto/main.ts -o out/ -e typescript -e @zeit/ncc",
+    "build": "ncc build cmd/nto/main.ts -o out/ -e typescript -e @zeit/ncc -e fs-extra",
     "build:prod": "yarn build",
-    "fmt": "yarn build && ./out/index.js fmt",
-    "test": "yarn build && ./out/index.js test",
-    "bench": "yarn build && ./out/index.js bench"
+    "nto": "yarn build && ./out/index.js",
+    "fmt": "yarn nto fmt",
+    "test": "yarn nto test",
+    "bench": "yarn nto bench"
   },
   "author": "Dirk de Visser <dirkdev98@gmail.com>",
   "license": "MIT",

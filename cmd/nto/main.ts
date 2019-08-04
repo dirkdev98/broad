@@ -1,9 +1,10 @@
 #! /usr/bin/env node
 
 import * as fs from "fs";
+import { mkdirSync, writeFileSync } from "fs";
 import * as path from "path";
 import { format, project, runner, testing } from "../../internal";
-import { rmdir, mkdir, rmdirSync, mkdirSync, writeFileSync } from "fs";
+import { fs as fsNew } from "../../pkg";
 
 const noop = () => {};
 const commandImplementations: Record<string, Function> = {
@@ -12,6 +13,7 @@ const commandImplementations: Record<string, Function> = {
   test: test,
   bench: test.bind(null, true),
   run: run,
+  init: init,
 };
 const commands = Object.keys(commandImplementations);
 
@@ -106,4 +108,28 @@ async function run(name: string, ..._: any[]) {
   }
 
   return runner.run(name);
+}
+
+async function init() {
+  const pathParts = process.cwd().split("/");
+  const projectName = pathParts[pathParts.length - 1];
+
+  // replace with defaults constant from 'project'
+  await fsNew.writeFile(
+    "./nto.json",
+    JSON.stringify(
+      {
+        project: projectName,
+        appDir: "cmd",
+        outDir: "out",
+        libDir: "pkg",
+        build: {
+          exclude: [],
+        },
+      },
+      null,
+      2,
+    ),
+  );
+  await project.syncConfigFiles();
 }

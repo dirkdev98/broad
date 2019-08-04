@@ -1,5 +1,7 @@
-import { readdirSync, statSync } from "fs";
+import { Dirent, readdirSync, statSync } from "fs";
 import { extname, join } from "path";
+import { fs } from "../../pkg";
+import { Config } from "./config";
 
 export const supportedExtensions = [".js", ".ts", ".json"];
 
@@ -38,4 +40,19 @@ function listFilesInPath(pathStr: string, list: string[] = []): string[] {
   }
 
   return list;
+}
+
+export async function resolveAppNames(rootDir: string, cfg: Config): Promise<string[]> {
+  const result: string[] = [];
+
+  const paths: Dirent[] = (await fs.readdir(join(rootDir, cfg.appDir), ({
+    withFileTypes: true,
+  } as unknown) as any)) as any;
+  for (const file of paths) {
+    if (file.isDirectory()) {
+      result.push(file.name);
+    }
+  }
+
+  return result;
 }
